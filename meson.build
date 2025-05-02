@@ -19,7 +19,10 @@ libdir = join_paths(prefix, get_option('libdir'))
 libexecdir = join_paths(prefix, get_option('libexecdir'))
 datadir = join_paths(prefix, get_option('datadir'))
 
+#pkgincludedir = join_paths(includedir, package_string)
+#pkgconfigdir = join_paths(libdir, 'pkgconfig')
 localedir = join_paths(datadir, 'locale')
+#pkglibdir = join_paths(libdir, package_name)
 pkgdatadir = join_paths(datadir, package_name)
 
 config_h = configuration_data()
@@ -42,17 +45,56 @@ add_project_arguments([
 # get suported warning flags
 test_args = [
   '-fstack-protector-strong',
+  #'-Waggregate-return',
+  #'-Warray-bounds',
   '-Wcast-align',
   '-Wchar-subscripts',
+  #'-Wclobbered',
+  #'-Wdeclaration-after-statement',
+  #'-Wempty-body',
+  #'-Wextra',
+  #'-Wformat=2',
+  #'-Wformat-nonliteral',
+  #'-Wformat-security',
   ['-Werror=format-security', '-Werror=format=2'],
+  #'-Wformat-signedness',
+  #'-Wignored-qualifiers',
+  #'-Wimplicit-function-declaration',
+  #'-Winit-self',
+  #'-Winline',
   '-Wmissing-declarations',
+  #'-Wmissing-format-attribute',
+  #'-Wmissing-include-dirs',
+  #'-Wmissing-noreturn',
+  #'-Wmissing-parameter-type',
   '-Wmissing-prototypes',
   '-Wnested-externs',
+  #'-Wno-discarded-qualifiers',
+  #'-Wno-missing-field-initializers',
+  #'-Wno-strict-aliasing',
+  #'-Wno-suggest-attribute=format',
+  #'-Wno-unused-parameter',
+  #'-Wold-style-definition',
+  #'-Woverride-init',
+  #'-Wpacked',
   '-Wpointer-arith',
+  #'-Wredundant-decls',
+  #'-Wreturn-type',
   '-Wshadow',
   '-Wsign-compare',
+  #'-Wstrict-aliasing',
+  #'-Wstrict-prototypes',
+  #'-Wswitch-default',
+  #'-Wtype-limits',
+  #'-Wundef',
+  #'-Wuninitialized',
+  #'-Wunused-but-set-variable',
   '-Wwrite-strings',
+  #'-ansi',
   '-fpermissive',
+  # migrate to gtk3
+  '-DGTK_DISABLE_SINGLE_INCLUDES',
+  '-DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED',
   ]
 
 cpp = meson.get_compiler('cpp')
