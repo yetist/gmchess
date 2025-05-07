@@ -499,11 +499,11 @@ void MainWindow::auto_save_chess_file()
 
 	char time1[200];
 	char time2[200];
-	time_t t;
+	time_t now;
 	struct tm *tmp;
 
-	t = time(NULL);
-	tmp = localtime(&t);
+	now = time(NULL);
+	tmp = localtime(&now);
 	strftime(time1, sizeof(time1), "%Y-%m-%d-%H-%M-", tmp);
 	strftime(time2, sizeof(time2), "%Y.%m.%d", tmp);
 	std::string name = p1_name->get_text()+"-"+p2_name->get_text()+".pgn";
@@ -1062,8 +1062,7 @@ void MainWindow::on_lose_game()
         Gtk::MessageDialog dialog(*this, _("be lose"), false,
                                   Gtk::MESSAGE_QUESTION,
                                   Gtk::BUTTONS_OK_CANCEL);
-        Glib::ustring msg =_("Will you resign in this game?");
-        dialog.set_secondary_text(msg);
+        dialog.set_secondary_text(_("Will you resign in this game?"));
         int result =dialog.run();
         switch (result) {
             case (Gtk::RESPONSE_OK): {
@@ -1180,6 +1179,7 @@ bool MainWindow::on_end_game(OVERSTATUS _over)
 			auto_save_chess_file();
 		board->free_game(false);
 		set_status();
+		return true;
 }
 
 void MainWindow::set_red_war_time(const Glib::ustring& f_time,const Glib::ustring& c_time)
