@@ -92,6 +92,9 @@ test_args = [
   '-Wwrite-strings',
   #'-ansi',
   '-fpermissive',
+  # migrate to gtk3
+  #'-DGTK_DISABLE_SINGLE_INCLUDES',
+  #'-DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED',
   ]
 
 cpp = meson.get_compiler('cpp')
@@ -148,8 +151,10 @@ vapidir = join_paths(datadir, 'vala', 'vapi')
 
 # Dependencies
 gtkmm_req = '>= 2.6.0'
+cairomm_req = '>= 1.16.0'
 
 gtkmm_dep = dependency('gtkmm-2.4', version: gtkmm_req)
+cairomm_dep = dependency('cairomm-1.16', version: cairomm_req)
 
 libdl_dep = cpp.find_library('dl', required: true)
 if not libdl_dep.found()

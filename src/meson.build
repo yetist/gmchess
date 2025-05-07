@@ -20,6 +20,6 @@ executable('gmchess',
     include_directories('.'),
     include_directories('..'),
     ],
-  dependencies : [gtkmm_dep, libiconv_dep],
+  dependencies : [gtkmm_dep, cairomm_dep, libiconv_dep],
   install: true,
 )
