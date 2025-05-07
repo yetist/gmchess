@@ -154,7 +154,7 @@ void Board::set_themes (const std::string &themes_)
     theme = themes_;
     /** 加载所需要图片进内存*/
     load_images ();
-    // redraw ();
+    redraw ();
 }
 
 Cairo::RefPtr<Cairo::ImageSurface> Board::get_pic (const std::string &name_)
@@ -229,14 +229,14 @@ void Board::configure_board (int _width)
         is_small_board = false;
         chessman_width = 57;
         load_images ();
-        // redraw ();
+        redraw ();
     }
     if (!is_small_board && _width < 521)
     {
         is_small_board = true;
         chessman_width = 29;
         load_images ();
-        // redraw ();
+        redraw ();
     }
 }
 
@@ -278,55 +278,26 @@ Gdk::Point Board::get_position (int pos_x, int pos_y)
 void Board::on_map ()
 {
     Gtk::DrawingArea::on_map ();
-    selected_chessman_image = Gdk::Image::create (Gdk::IMAGE_SHARED, get_window ()->get_visual (), chessman_width, chessman_width);
+    //selected_chessman_image = Gdk::Image::create (Gdk::IMAGE_SHARED, get_window ()->get_visual (), chessman_width, chessman_width);
+    //selected_chessman_image = Cairo::ImageSurface::create(Cairo::Format::FORMAT_ARGB32, chessman_width, chessman_width);
+
 }
 
-// bool Board::on_configure_event (GdkEventConfigure *ev)
-//{
-//     printf ("%s +%d : %s()\n", __FILE__, __LINE__, __FUNCTION__);
-////    // if(ui_pixmap)
-////    //	return true;
-////    ui_pixmap = Gdk::Pixmap::create (this->get_window (), get_width (), get_height ());
-////
-////    redraw ();
-//  return true;
-//}
+ bool Board::on_configure_event (GdkEventConfigure *ev)
+{
+     printf ("%s +%d : %s()\n", __FILE__, __LINE__, __FUNCTION__);
+    // if(ui_pixmap)
+    //	return true;
+    //ui_pixmap = Gdk::Pixmap::create (this->get_window (), get_width (), get_height ());
+
+    redraw ();
+  return true;
+}
 
 bool Board::on_expose_event (GdkEventExpose *event)
 {
     printf ("%s +%d : %s()\n", __FILE__, __LINE__, __FUNCTION__);
-    // This is where we draw on the window
-    Glib::RefPtr<Gdk::Window> window = get_window ();
-    if (window)
-    {
-        Gtk::Allocation allocation = get_allocation ();
-        const int width = allocation.get_width ();
-        const int height = allocation.get_height ();
-
-        // coordinates for the center of the window
-        int xc, yc;
-        xc = width / 2;
-        yc = height / 2;
-
-        Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context ();
-        cr->set_line_width (10.0);
-
-        // clip to the area indicated by the expose event so that we only redraw
-        // the portion of the window that needs to be redrawn
-        cr->rectangle (event->area.x, event->area.y,
-                       event->area.width, event->area.height);
-        cr->clip ();
-
-        // draw red lines out from the center of the window
-        cr->set_source_rgb (0.8, 0.0, 0.0);
-        cr->move_to (0, 0);
-        cr->line_to (xc, yc);
-        cr->line_to (0, height);
-        cr->move_to (xc, yc);
-        cr->line_to (width, yc);
-        cr->stroke ();
-        draw_bg (cr);
-    }
+    redraw();
 
     return true;
     // this->get_window ()->draw_drawable (this->get_style ()->get_black_gc (), ui_pixmap,
@@ -340,28 +311,28 @@ bool Board::on_expose_event (GdkEventExpose *event)
 #if 1
 void Board::redraw ()
 {
-    //draw_bg ();
+    draw_bg ();
     draw_board ();
 
-    int x, y;
-    ui_pixmap->get_size (x, y);
-    this->get_window ()->draw_drawable (this->get_style ()->get_black_gc (), ui_pixmap,
-                                        0, 0,
-                                        0, 0,
-                                        x, y);
+    //int x, y;
+    //ui_pixmap->get_size (x, y);
+    //this->get_window ()->draw_drawable (this->get_style ()->get_black_gc (), ui_pixmap,
+    //                                    0, 0,
+    //                                    0, 0,
+    //                                    x, y);
 }
 
 void Board::redraw_with_line (int mv, bool select)
 {
-    //draw_bg ();
+    draw_bg ();
     draw_trace (mv);
     draw_board ();
-    int x, y;
-    ui_pixmap->get_size (x, y);
-    this->get_window ()->draw_drawable (this->get_style ()->get_black_gc (), ui_pixmap,
-                                        0, 0,
-                                        0, 0,
-                                        x, y);
+    //int x, y;
+    //ui_pixmap->get_size (x, y);
+    //this->get_window ()->draw_drawable (this->get_style ()->get_black_gc (), ui_pixmap,
+    //                                    0, 0,
+    //                                    0, 0,
+    //                                    x, y);
     draw_select_frame (select);
 }
 #endif
@@ -441,15 +412,18 @@ bool Board::on_button_press_event (GdkEventButton *ev)
         /** 右键取消选择*/
         /** the right click canel the choose*/
         selected_chessman = -1;
-        // draw_select_frame(false);
+        draw_select_frame(false);
         redraw ();
     }
 
     return true;
 }
 
-void Board::draw_bg (Cairo::RefPtr<Cairo::Context> &cr)
+void Board::draw_bg (void)
 {
+    Glib::RefPtr<Gdk::Window> window = get_window ();
+    Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context ();
+
     Gdk::Point p1 = get_coordinate (0, 0);
     Gdk::Point p2 = get_coordinate (8, 9);
 
@@ -699,9 +673,39 @@ void Board::draw_chessman (int x, int y, int chessman)
     int px = p.get_x () - chessman_width / 2;
     int py = p.get_y () - chessman_width / 2;
 
-   // ui_pixmap->draw_pixbuf (get_style ()->get_black_gc (), chessman_images[chess_type],
-   //                         0, 0, px, py, chessman_images[chess_type]->get_width (), chessman_images[chess_type]->get_height (),
-   //                         Gdk::RGB_DITHER_NONE, 0, 0);
+    Glib::RefPtr<Gdk::Window> window = get_window ();
+    Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context ();
+
+#if 0
+
+    int grid_width;
+    int grid_height;
+    get_grid_size (grid_width, grid_height);
+
+    Cairo::RefPtr<Cairo::ImageSurface> surface;
+    Cairo::RefPtr<Cairo::Context> pcr;
+
+    surface = Cairo::ImageSurface::create(Cairo::Format::FORMAT_ARGB32,
+        grid_width, grid_height);
+    pcr = Cairo::Context::create(surface);
+
+    double sx = (double)grid_width / (double)chessman_images[chess_type]->get_width ();
+    double sy = (double)grid_height / (double)chessman_images[chess_type]->get_height();
+
+    Cairo::RefPtr<Cairo::Pattern> pattern = Cairo::SurfacePattern::create(chessman_images[chess_type]);
+    pattern->set_matrix(Cairo::scaling_matrix(sx, sy));
+    printf("grid: w=%d, h=%d, chess: w=%d, h=%d\n", grid_width, grid_height,
+        chessman_images[chess_type]->get_width(),
+        chessman_images[chess_type]->get_height());
+
+    Cairo::RefPtr<Cairo::SurfacePattern> spattern = \
+           Cairo::RefPtr<Cairo::SurfacePattern>::cast_dynamic(pattern);
+    spattern->set_filter	(Cairo::Filter::FILTER_BEST);
+    cr->set_source(surface, px, py);
+#else
+    cr->set_source(chessman_images[chess_type], px, py);
+    cr->paint();
+#endif
 }
 
 void Board::draw_show_can_move ()
@@ -725,24 +729,24 @@ void Board::draw_show_can_move ()
 
 void Board::draw_phonily_point (Gdk::Point &p)
 {
+    Glib::RefPtr<Gdk::Window> window = get_window ();
+    Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context ();
+
     int px = p.get_x () - 11 / 2;
     int py = p.get_y () - 11 / 2;
-    // int px = p.get_x() - chessman_width / 2;
-    // int py = p.get_y() - chessman_width / 2;
-    // ui_pixmap->copy_to_image(selected_chessman_image, px, py, 0, 0, chessman_width, chessman_width);
-    // ui_pixmap->draw_pixbuf(get_style()->get_black_gc(),chessman_images[SELECTED_CHESSMAN],
-    //			0, 0, px, py, chessman_images[SELECTED_CHESSMAN]->get_width(), chessman_images[SELECTED_CHESSMAN]->get_height(),
-    //			Gdk::RGB_DITHER_NONE, 0, 0);
-    ui_pixmap->copy_to_image (selected_chessman_image, px, py, 0, 0, 11, 11);
+    //ui_pixmap->copy_to_image (selected_chessman_image, px, py, 0, 0, 11, 11);
+
+    cr->set_source(chessman_images[PROPMT], px, py);
+    cr->paint();
  //   ui_pixmap->draw_pixbuf (get_style ()->get_black_gc (), chessman_images[PROPMT],
  //                           0, 0, px, py, chessman_images[PROPMT]->get_width (), chessman_images[PROPMT]->get_height (),
  //                           Gdk::RGB_DITHER_NONE, 0, 0);
-    int x, y;
-    ui_pixmap->get_size (x, y);
-    this->get_window ()->draw_drawable (this->get_style ()->get_black_gc (), ui_pixmap,
-                                        0, 0,
-                                        0, 0,
-                                        x, y);
+//    int x, y;
+//    ui_pixmap->get_size (x, y);
+//    this->get_window ()->draw_drawable (this->get_style ()->get_black_gc (), ui_pixmap,
+//                                        0, 0,
+//                                        0, 0,
+//                                        x, y);
 }
 
 void Board::draw_select_frame (bool selected)
@@ -759,23 +763,30 @@ void Board::draw_select_frame (bool selected)
     int px = p.get_x () - chessman_width / 2;
     int py = p.get_y () - chessman_width / 2;
 
+    Glib::RefPtr<Gdk::Window> window = get_window ();
+    Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context ();
+    cr->save();
+
     if (selected)
     {
-        ui_pixmap->copy_to_image (selected_chessman_image, px, py, 0, 0, chessman_width, chessman_width);
+        //ui_pixmap->copy_to_image (selected_chessman_image, px, py, 0, 0, chessman_width, chessman_width);
+        cr->set_source(chessman_images[SELECTED_CHESSMAN], px, py);
+        cr->paint();
   //      ui_pixmap->draw_pixbuf (get_style ()->get_black_gc (), chessman_images[SELECTED_CHESSMAN],
   //                              0, 0, px, py, chessman_images[SELECTED_CHESSMAN]->get_width (), chessman_images[SELECTED_CHESSMAN]->get_height (),
   //                              Gdk::RGB_DITHER_NONE, 0, 0);
     } else
     {
-        ui_pixmap->draw_image (get_style ()->get_black_gc (), selected_chessman_image, 0, 0, px, py, -1, -1);
+        //ui_pixmap->draw_image (get_style ()->get_black_gc (), selected_chessman_image, 0, 0, px, py, -1, -1);
+        cr->restore();
     }
 
-    int x, y;
-    ui_pixmap->get_size (x, y);
-    this->get_window ()->draw_drawable (this->get_style ()->get_black_gc (), ui_pixmap,
-                                        0, 0,
-                                        0, 0,
-                                        x, y);
+//    int x, y;
+//    ui_pixmap->get_size (x, y);
+//    this->get_window ()->draw_drawable (this->get_style ()->get_black_gc (), ui_pixmap,
+//                                        0, 0,
+//                                        0, 0,
+//                                        x, y);
 }
 
 void Board::draw_board ()
@@ -794,16 +805,26 @@ void Board::draw_trace (int mv)
     int src = m_engine.get_move_src (mv);
     int dst = m_engine.get_move_dst (mv);
 
-    Glib::RefPtr<Gdk::GC> gc = this->get_style ()->get_white_gc ();
-    gc->set_rgb_fg_color (Gdk::Color (color));
+    //Glib::RefPtr<Gdk::GC> gc = this->get_style ()->get_white_gc ();
+    Glib::RefPtr<Gdk::Window> window = get_window ();
+    Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context ();
+
+    //gc->set_rgb_fg_color (Gdk::Color (color));
+    cr->set_source_rgb (0.09, 0.53, 0.39);
+    //25,137,100
+
     Gdk::Point s1 = get_coordinate (m_engine.RANK_X (src) - 3, m_engine.RANK_Y (src) - 3);
     Gdk::Point s2 = get_coordinate (m_engine.RANK_X (dst) - 3, m_engine.RANK_Y (dst) - 3);
 
-    gc->set_line_attributes (4, Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_BEVEL);
-    std::vector<Gdk::Point> poss;
-    poss.push_back (s1);
-    poss.push_back (s2);
-    ui_pixmap->draw_lines (gc, poss);
+    //gc->set_line_attributes (4, Gdk::LINE_SOLID, Gdk::CAP_NOT_LAST, Gdk::JOIN_BEVEL);
+    cr->set_line_width (4.0);
+    //std::vector<Gdk::Point> poss;
+    //poss.push_back (s1);
+    //poss.push_back (s2);
+    //ui_pixmap->draw_lines (gc, poss);
+    cr->move_to(s1.get_x (), s1.get_y ());
+    cr->line_to(s2.get_x (), s2.get_y ());
+    cr->stroke();
 }
 void Board::first_move ()
 {
@@ -932,7 +953,7 @@ int Board::try_move (int mv)
         else
             CSound::play (SND_MOVE);
 
-        // redraw_with_line (mv, true);
+        redraw_with_line (mv, true);
         selected_chessman = m_engine.get_piece (dst);
         printf ("move = %d finish move and redraw now\n", mv);
         selected_chessman = -1;

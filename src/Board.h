@@ -44,7 +44,7 @@ class Board : public Gtk::DrawingArea {
   protected:
     void on_map ();
     virtual bool on_expose_event (GdkEventExpose *event);
-    // bool on_configure_event(GdkEventConfigure* ev);
+    bool on_configure_event(GdkEventConfigure* ev);
     bool on_button_press_event (GdkEventButton *ev);
 
     Cairo::RefPtr<Cairo::ImageSurface> get_pic (const std::string &name_);
@@ -64,8 +64,8 @@ class Board : public Gtk::DrawingArea {
      * @brief 画棋盘背景
      * draw the background of board
      */
-    //void draw_bg ();
-    void draw_bg (Cairo::RefPtr<Cairo::Context> &cr);
+    void draw_bg (void);
+    //void draw_bg (Cairo::RefPtr<Cairo::Context> &cr);
     /**
      * @brief 画棋子 坐标为棋盘9x10坐标
      * draw the chess
@@ -230,7 +230,7 @@ class Board : public Gtk::DrawingArea {
     /** 棋子图像 */
     Cairo::RefPtr<Cairo::ImageSurface> chessman_images[18];
     /** 选中图像*/
-    Glib::RefPtr<Gdk::Image> selected_chessman_image;
+    Glib::RefPtr<Cairo::ImageSurface> selected_chessman_image;
     /** 选中的棋盘9x10坐标*/
     int selected_x;
     int selected_y;
