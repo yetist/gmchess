@@ -69,8 +69,8 @@ MainWindow::MainWindow():menubar(NULL)
 	ui_xml = Gtk::Builder::create_from_file(main_ui,"main_window");
 	if(!ui_xml)
 		exit(271);
-	Gtk::VBox* main_window =0;
-	Gtk::VBox* box_board=0;
+	Gtk::Box* main_window =0;
+	Gtk::Box* box_board=0;
 
 	ui_xml->get_widget("main_window",main_window);
 	ui_xml->get_widget("vbox_board",box_board);
@@ -119,7 +119,7 @@ MainWindow::MainWindow():menubar(NULL)
 	/** 设置菜单, set the menu*/
 	init_ui_manager();
 	menubar = ui_manager->get_widget("/MenuBar");
-	Gtk::VBox* menu_tool_box=0;
+	Gtk::Box* menu_tool_box=0;
 	ui_xml->get_widget("box_menu_toolbar",menu_tool_box);
 	menu_tool_box->pack_start(*menubar,true,true);
 

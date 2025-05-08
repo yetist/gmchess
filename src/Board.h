@@ -15,7 +15,6 @@
 #include "Engine.h"
 #include "Pgnfile.h"
 #include "robot.h"
-//#include "pidgin.h"
 
 class MainWindow;
 
