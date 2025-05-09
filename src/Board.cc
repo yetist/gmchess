@@ -289,9 +289,11 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 	if(is_fight_to_robot()||is_network_game()){
 		if(!is_human_player())
 			return true;
+
 	}
 	if(ev->type == GDK_BUTTON_PRESS&& ev->button == 1)
 	{
+
 		Gdk::Point p = get_position(ev->x, ev->y);
 		selected_x = p.get_x();
 		selected_y = p.get_y();
@@ -351,6 +353,7 @@ bool Board::on_button_press_event(GdkEventButton* ev)
 		queue_draw();
 
 	}
+
 	return true;
 }
 
@@ -736,6 +739,7 @@ int Board::try_move(int mv)
 		selected_chessman = m_engine.get_piece(dst);
 		printf("move = %d finish move and redraw now\n",mv);
 		selected_chessman=-1;
+
 		std::string iccs_str=m_engine.move_to_iccs_str(mv);
 		/** 对战时的处理*/
 		if(is_fight_to_robot()){
@@ -807,6 +811,7 @@ int Board::try_move(int mv)
 		}
 
 	}
+
 	return 0;
 
 }
@@ -892,6 +897,7 @@ void Board::free_game(bool redraw_)
 	m_status = FREE_STATUS;
 	is_rev_board=false;
 	m_human_black=false;
+
 	if(redraw_){
 		m_engine.init_snapshot(start_fen);
 		queue_draw();
@@ -899,8 +905,8 @@ void Board::free_game(bool redraw_)
 }
 void Board::rev_game()
 {
-	is_rev_board=!is_rev_board;
-	m_human_black=!m_human_black;
+	is_rev_board=1-is_rev_board;
+	m_human_black=1-m_human_black;
 	queue_draw();
 }
 
