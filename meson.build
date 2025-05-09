@@ -19,10 +19,7 @@ libdir = join_paths(prefix, get_option('libdir'))
 libexecdir = join_paths(prefix, get_option('libexecdir'))
 datadir = join_paths(prefix, get_option('datadir'))
 
-#pkgincludedir = join_paths(includedir, package_string)
-#pkgconfigdir = join_paths(libdir, 'pkgconfig')
 localedir = join_paths(datadir, 'locale')
-#pkglibdir = join_paths(libdir, package_name)
 pkgdatadir = join_paths(datadir, package_name)
 
 config_h = configuration_data()
@@ -92,9 +89,6 @@ test_args = [
   '-Wwrite-strings',
   #'-ansi',
   '-fpermissive',
-  # migrate to gtk3
-  '-DGTK_DISABLE_SINGLE_INCLUDES',
-  '-DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED',
   ]
 
 cpp = meson.get_compiler('cpp')
