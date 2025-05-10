@@ -20,7 +20,8 @@
 
 /** 边界的宽度*/
 /**  width of border */
-const int border_width = 32;
+int border_width = 42;
+int border_height = 42;
 /** 棋子的宽度*/
 /** width of chessman */
 //const int chessman_width = 57;
@@ -239,7 +240,7 @@ Gdk::Point Board::get_coordinate(int pos_x, int pos_y)
 	int grid_height;
 	get_grid_size(grid_width, grid_height);
 	pos_x = pos_x * grid_width + border_width;
-	pos_y = pos_y * grid_height + border_width;
+	pos_y = pos_y * grid_height + border_height;
 
 	return Gdk::Point(pos_x, pos_y);
 }
@@ -251,7 +252,7 @@ Gdk::Point Board::get_position(int pos_x, int pos_y)
 	int grid_height;
 	get_grid_size(grid_width, grid_height);
 	pos_x -= border_width;
-	pos_y -= border_width;
+	pos_y -= border_height;
 	pos_x += grid_width / 2;
 	pos_y += grid_height / 2;
 	int x = pos_x / grid_width;
@@ -367,6 +368,7 @@ void Board::draw_bg()
 	bgcr = Cairo::Context::create(surface);
 
 	Cairo::RefPtr<Cairo::Pattern> pattern = Cairo::SurfacePattern::create(bg_image);
+
 	pattern->set_extend(Cairo::Extend::EXTEND_REPEAT);
 	bgcr->set_source(pattern);
 	bgcr->fill();
@@ -499,20 +501,34 @@ void Board::draw_palace(Cairo::RefPtr<Cairo::Context> &cr, int x, int y)
 
 void Board::draw_chessman(int x, int y, int chessman)
 {
-
-
 	int chess_type = m_engine.get_chessman_type(chessman);
 	if(chess_type<0||chess_type>13)
 		return;
 
 	Gdk::Point p = get_coordinate(x, y);
-	int px = p.get_x() - chessman_width / 2;
-	int py = p.get_y() - chessman_width / 2;
 
 	Glib::RefPtr<Gdk::Window> window = get_window ();
 	Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context ();
 
-	cr->set_source(chessman_images[chess_type], px, py);
+	int grid_width;
+	int grid_height;
+	get_grid_size(grid_width, grid_height);
+	Cairo::RefPtr<Cairo::SurfacePattern> sPattern =
+		Cairo::SurfacePattern::create(chessman_images[chess_type]);
+	Cairo::RefPtr<Cairo::Pattern> pattern =
+		Cairo::RefPtr<Cairo::SurfacePattern>::cast_dynamic(sPattern);
+	double cw = chessman_images[chess_type]->get_width();
+	double ch = chessman_images[chess_type]->get_height();
+	int px = p.get_x() - grid_width / 2.0;
+	int py = p.get_y() - grid_height / 2.0;
+
+	printf("cw: %f, gw: %f\n", cw, ch);
+	Cairo::Matrix scaler = Cairo::scaling_matrix(cw / grid_width, ch / grid_height); //chessman_width/grid_width, chessman_width/grid_height);
+	scaler.translate(-px,-py);
+	pattern->set_matrix(scaler);
+	sPattern->set_filter(Cairo::Filter::FILTER_BEST);
+
+	cr->set_source(pattern);
 	cr->paint();
 }
 
